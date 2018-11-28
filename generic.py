@@ -48,7 +48,7 @@ transition_matrix[0,2] = 1
 transition_matrix[0,3] = 1
 transition_matrix[1,3] = 1
 transition_matrix[2,3] = 1
-dimensions = transition_matrix.shape[0] # in this case, (4,4) = 4
+dimension = transition_matrix.shape[0] # in this case, (4,4) = 4
 
 
 '''We will simulate trauma by removing the edge from v1 -> v3 by simply saying there are no transitions'''	
@@ -58,7 +58,7 @@ transition_matrix[1,3] = 0
 lp_problem = _pulp.LpProblem("Mincost Brain",_pulp.LpMinimize)
 
 sequence = []
-for i in range(0,2):
+for i in range(0,dimension):
 	sequence += str(i)
 
 rows = sequence
@@ -68,8 +68,34 @@ First, lets specify the scaling factor variables.
 Lets make it simple and have a scaling factor for each edge
 '''
 scaling_factors = _pulp.LpVariable.dicts("scaling_factors",(rows,columns),lowBound=1,cat="Continuous")
-print scaling_factors['0']['0']
+
 '''
 Next up, lets create the flow variables.
 Again, for simplicity, one for each edge (regardless of capacity)
+'''
+flow_values = _pulp.LpVariable.dicts("flow_values",(rows,columns),lowBound=0,cat="Continuous")
+
+
+'''
+Now its time to add the constraints
+First, the objective function
+in this case, just use lpsum over scaling_factors which takes in the list of variables
+
+scaling_factors_list = a list of all of the scaling factor variables in this case
+e.g.,
+lp_problem += scaling_factor[0][0] + scaling_factors[0][1] + .... + scaling_fators[n][n]
+'''
+
+'''
+Now lets add the Flow constraints
+
+for each flow variable
+lp_problem += flow_variable[i][j] <= scaling_factor[i][j] * transition_matrix[i][j]
+'''
+
+
+'''
+Finally, lets solve it!
+
+lp_problem.solve()
 '''
