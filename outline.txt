@@ -2,12 +2,14 @@
 2. Algorithm (8 min)
 2.1. Simplified assumptions 
 2.2. Formulation of LP
-2.2.1. Constant cost
 2.2.2. Linear cost
 	Linear cost function can be solved in Polynomial time using LP Solver.
 2.2.3. Quadratic cost
-	quadratic cost function is hard for LP solver. (NP Hard?)
+	quadratic cost function is hard for LP solver.
 	convex optimization can solve quad cost func in polynomial time. 
+2.2.1. Constant cost
+	constant cost function is hard.
+	relaxation can be done.
 2.2.4. Integer LP
 	Integer LP is NP hard for LP solver.
 	When cost function is convex, we can apply "multi edges" method and use LP Solver to solve in Polynomial time.
@@ -18,3 +20,8 @@
 3.2. work on 1000 test cases
 3.3. work on different trauma
 4. Future work and conclusions (2 min)
+
+
+TODO:
+1. what input datasets we want to try?
+ideas: how is the time cost scaled with the size of input?
