@@ -4,6 +4,7 @@
 2.2. Formulation of LP
 2.2.2. Linear cost
 	Linear cost function can be solved in Polynomial time using LP Solver.
+	
 2.2.3. Quadratic cost
 	quadratic cost function is hard for LP solver.
 	convex optimization can solve quad cost func in polynomial time. 
@@ -24,4 +25,6 @@
 
 TODO:
 1. what input datasets we want to try?
-ideas: how is the time cost scaled with the size of input?
+2. linear cost function
+Experiment 1: how is the time cost scaled with the size of input?
+Experiment 2: min a * sum(x_i -1);  min sum(a_i * (x_i - 1))
