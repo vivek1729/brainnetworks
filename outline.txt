@@ -1,0 +1,16 @@
+1. Outline
+2. Algorithm (8 min)
+2.1. Simplified assumptions 
+2.2. Formulation of LP
+2.2.1. Constant cost
+2.2.2. Linear cost
+2.2.3. Quadratic cost
+	convex optimization
+2.2.4. Integer LP
+	"multi edges" for convex cost function
+2.3. Validity of the results
+3. Experiment and results (4 min)
+3.1. scale with size of graph
+3.2. work on 1000 test cases
+3.3. work on different trauma
+4. Future work and conclusions (2 min)
