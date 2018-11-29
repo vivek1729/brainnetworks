@@ -4,10 +4,14 @@
 2.2. Formulation of LP
 2.2.1. Constant cost
 2.2.2. Linear cost
+	Linear cost function can be solved in Polynomial time using LP Solver.
 2.2.3. Quadratic cost
-	convex optimization
+	quadratic cost function is hard for LP solver. (NP Hard?)
+	convex optimization can solve quad cost func in polynomial time. 
 2.2.4. Integer LP
-	"multi edges" for convex cost function
+	Integer LP is NP hard for LP solver.
+	When cost function is convex, we can apply "multi edges" method and use LP Solver to solve in Polynomial time.
+	When cost function is non-convex?
 2.3. Validity of the results
 3. Experiment and results (4 min)
 3.1. scale with size of graph
