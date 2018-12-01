@@ -13,10 +13,12 @@ function [A,B,f1,f2]=createadjmat(size,a,b,p,r)
 %f2: the max flow for graph after trauma
 A=zeros(size,size);
 A(1,size)=1;
+
+%create the original graph
 for i=1:size-b
     for j=a+1:size
-    r=rand(1);
-    if r<p
+    randomnumber=rand(1);
+    if randomnumber<p
         A(i,j)=1;
     end
     end
@@ -25,6 +27,8 @@ for i=1:size
     A(i,i)=0;
 end
 
+
+%compute maxflow for original graph
 temp=sum(A,2);
 c=sum(temp(1:a));
 A1=zeros(size+2,size+2);
@@ -36,12 +40,14 @@ f1 = maxflow(G1,1,size+2);
 
 B=A;
 
+%remove nodes
+permut=randperm(size);
 for i=1:r
-    k=randi([1,size])
-    B(:,k)=0;
-    B(k,:)=0;
+    B(:,permut(i))=0;
+    B(permut(i),:)=0;
 end
 
+%compute maxflow for graph after trauma
 B1=zeros(size+2,size+2);
 B1(2:size+1,2:size+1)=B;
 B1(1,2:a+1)=c;
