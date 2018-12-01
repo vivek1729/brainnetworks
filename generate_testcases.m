@@ -1,9 +1,9 @@
 clear all;
-size_seq = 20 * [10, 20, 40]
-a_seq = 1:3
-b_seq = 1:3
-p_seq = [0.5 0.6 0.7]
-r_seq = 1
+size_seq = 20 * [10, 20, 40];  % size of the matrix
+a_seq = 1:3;    % number of sources
+b_seq = 1:3;    % number of sinks
+p_seq = [0.5 0.6 0.7];      % density of graph (to be explained)
+r_seq = 1;      % nunmber of trauma (to be explained)
 
 rng(1000);  % set seeds
 
