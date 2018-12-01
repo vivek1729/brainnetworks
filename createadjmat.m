@@ -3,7 +3,7 @@ function [A,B]=createadjmat(size,a,b,p,r)
 %size: number of nodes in the graph
 %a: number of sources. Source nodes would be 1 to a
 %b: number of sinks. Sink nodes would be size-b+1 to size
-%p: probability of adding an edge. So if p is large, the graph would be
+%p: probability of adding an edge. So if p is small, the graph would be
 %more sparse
 %r: number of trauma
 %s: size of trauma
@@ -11,13 +11,11 @@ function [A,B]=createadjmat(size,a,b,p,r)
 %A: adjacency matrix before trauma
 %B: adjacency matrix after trauma
 A=zeros(size,size);
-for i=1:size-b
-    A(i,a+i)=1;
-end
+A(1,size)=1;
 for i=1:size-b
     for j=a+1:size
     r=rand(1);
-    if r>p
+    if r<p
         A(i,j)=1;
     end
     end
@@ -29,7 +27,7 @@ end
 B=A;
 
 for i=1:r
-    k=randi([1,size])
+    k=randi([1,size]);
     B(:,k)=0;
     B(k,:)=0;
 end
