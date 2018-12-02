@@ -24,12 +24,14 @@ for iRow = 1:nRow
         csvwrite(strcat("testcases/linear/adjm_A_", num2str(iRow), ".csv"), A);
         csvwrite(strcat("testcases/linear/adjm_B_", num2str(iRow), ".csv"), B);
     end
-    allComb(iRow, 6:7) = [maxFlowBefore, maxFlowAfter];
+    
+    %allComb(iRow, 6:7) = [maxFlowBefore, maxFlowAfter];
 end
 %%
 csvwrite("testcases/linear/allComb.csv", allComb);
 %%
 rng(1000);  % set seeds
-[A, B] = createadjmat(800, 3, 1, 0.7, 1);
+[A, B, f1, f2] = createadjmat(100, 1, 1, 1, 10000);
 size(A)
 size(B)
+f1, f2
