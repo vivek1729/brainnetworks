@@ -1,10 +1,17 @@
 clear all;
-%x axises
-size_seq = 10 * [10, 15, 20];  % size of the matrix
-a_seq = [4, 8, 16];    % number of sources
-b_seq = [4, 8, 16];    % number of sinks
-p_seq = [0.2, 0.5, 0.8];      % density of graph (to be explained)
-r_seq = [8, 32, 64];      % nunmber of trauma (to be explained)
+% %testcase 1
+% size_seq = 10 * [10, 15, 20];  % size of the matrix
+% a_seq = [4, 8, 16];    % number of sources
+% b_seq = [4, 8, 16];    % number of sinks
+% p_seq = [0.2, 0.5, 0.8];      % density of graph (to be explained)
+% r_seq = [8, 32, 64];      % nunmber of trauma (to be explained)
+
+%testcase 2
+size_seq = 10 * (10:10:100);  % size of the matrix
+a_seq = [16];    % number of sources
+b_seq = [16];    % number of sinks
+p_seq = [0.3];      % density of graph (to be explained)
+r_seq = [64];      % nunmber of trauma (to be explained)
 
 %y axises
 %time
@@ -30,14 +37,14 @@ for iRow = 1:nRow
     disp(strcat(num2str(maxFlowBefore), '\t', num2str(maxFlowAfter)))
     
     if isSquare(A) && isSquare(B)
-        csvwrite(strcat("testcases/linear/adjm_A_", num2str(iRow), ".csv"), A);
-        csvwrite(strcat("testcases/linear/adjm_B_", num2str(iRow), ".csv"), B);
+        csvwrite(strcat("testcases/sizeofgraphset2/adjm_A_", num2str(iRow), ".csv"), A);
+        csvwrite(strcat("testcases/sizeofgraphset2/adjm_B_", num2str(iRow), ".csv"), B);
     end
     
     allComb(iRow, 6:7) = [maxFlowBefore, maxFlowAfter];
 end
 %%
-csvwrite("testcases/linear/allComb.csv", allComb);
+csvwrite("testcases/sizeofgraphset2/allComb.csv", allComb);
 %%
 rng(1000);  % set seeds
 [A, B, f1, f2] = createadjmat(100, 10, 10, 0.2, 80);
