@@ -1,10 +1,10 @@
 clear all;
 %x axises
-size_seq = 10 * [10, 20, 40];  % size of the matrix
-a_seq = [10, 20, 40];    % number of sources
-b_seq = [10, 20, 40];    % number of sinks
+size_seq = 10 * [10, 15, 20];  % size of the matrix
+a_seq = [4, 8, 16];    % number of sources
+b_seq = [4, 8, 16];    % number of sinks
 p_seq = [0.2, 0.5, 0.8];      % density of graph (to be explained)
-r_seq = 10;      % nunmber of trauma (to be explained)
+r_seq = [8, 32, 64];      % nunmber of trauma (to be explained)
 
 %y axises
 %time
@@ -40,7 +40,7 @@ end
 csvwrite("testcases/linear/allComb.csv", allComb);
 %%
 rng(1000);  % set seeds
-[A, B, f1, f2] = createadjmat(200, 10, 10, 0.2, 10);
+[A, B, f1, f2] = createadjmat(100, 10, 10, 0.2, 80);
 size(A)
 size(B)
 f1, f2
