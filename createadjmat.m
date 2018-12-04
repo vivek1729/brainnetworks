@@ -41,7 +41,7 @@ f1 = maxflow(G1,1,size+2);
 B=A;
 
 %remove nodes
-permut=a+randperm(1,size-a-b);
+permut=a+randperm(size-a-b);
 for i=1:r
     B(:,permut(i))=0;
     B(permut(i),:)=0;
