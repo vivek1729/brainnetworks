@@ -1,4 +1,5 @@
 clear all;
+%% linear cost function test cases
 % %testcase 1
 % size_seq = 10 * [10, 15, 20];  % size of the matrix
 % a_seq = [4, 8, 16];    % number of sources
@@ -45,9 +46,67 @@ for iRow = 1:nRow
 end
 %%
 csvwrite("testcases/sizeofgraphset2/allComb.csv", allComb);
+% %% 
+% rng(1000);  % set seeds
+% [A, B, f1, f2] = createadjmat(100, 10, 10, 0.2, 80);
+% size(A)
+% size(B)
+% f1, f2
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% BN_DATASET testing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-rng(1000);  % set seeds
-[A, B, f1, f2] = createadjmat(100, 10, 10, 0.2, 80);
-size(A)
-size(B)
-f1, f2
+filename = 'bn-cat-mixed-species_brain_1.txt'
+M = csvread(strcat('bn_dataset/', filename));
+size(M)
+nSourceSink = [5, 10];
+nTrauma = [5, 10, 20, 40];
+%%
+filename = 'bn-fly-drosophila_medulla_1.txt'
+M = csvread(strcat('bn_dataset/', filename));
+size(M)
+nSourceSink = [30, 300];
+nTrauma = [10 50 250 1000];
+%%
+filename = 'bn-macaque-rhesus_brain_1.txt'
+M = csvread(strcat('bn_dataset/', filename));
+size(M)
+nSourceSink = [10, 40];
+nTrauma = [5 10 50 100];
+%%
+filename = 'bn-mouse_brain_1.txt'
+M = csvread(strcat('bn_dataset/', filename));
+size(M)
+nSourceSink = [10, 40];
+nTrauma = [5 10 50 100];
+
+%% test cases
+% allComb.csv header: nSource/nSink, nTrauma, maxFlowBefore, maxFlowAfter
+rng(1000);
+clearvars allComb
+allComb = allcomb(nSourceSink, nTrauma);
+for iRow = 1:nrow(allComb)
+    M = csvread(strcat('bn_dataset/', filename));
+    nNode = nrow(M);
+    nSource = allComb(iRow, 1);
+    nSink = nSource;
+    nTrauma = allComb(iRow, 2); 
+    [MBefore, MAfter, maxFlowBefore, maxFlowAfter] = ...
+        get_stroke_random(M, nSource, nSink, nTrauma);
+    csvwrite(strcat('bn_dataset/out/', filename, num2str(iRow), 'MBefore.csv'), MBefore);
+    csvwrite(strcat('bn_dataset/out/', filename, num2str(iRow), 'MAfter.csv'), MAfter);
+    allComb(iRow, 3) = maxFlowBefore;
+    allComb(iRow, 4) = maxFlowAfter;
+    disp(allComb(iRow,:));
+end
+csvwrite(strcat('bn_dataset/out/', filename, 'allComb.csv'), allComb);
