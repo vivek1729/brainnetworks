@@ -74,5 +74,5 @@ df %>%
     geom_line(aes(color = group)) +
     scale_color_npg2() +
     theme(legend.position = c(0.2,0.8)) +
-    plot_save_pub('costtime-per-numberofnodes')
+    plot_save_pub('costtime-per-numberofnodes-2')
 
