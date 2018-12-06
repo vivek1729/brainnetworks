@@ -109,4 +109,5 @@ for iRow = 1:nrow(allComb)
     allComb(iRow, 4) = maxFlowAfter;
     disp(allComb(iRow,:));
 end
+delete(strcat('bn_dataset/out/', filename, 'allComb.csv'));
 csvwrite(strcat('bn_dataset/out/', filename, 'allComb.csv'), allComb);
