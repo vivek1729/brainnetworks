@@ -1,6 +1,7 @@
 import pulp
 import csv
 import numpy
+import time
 from pulp import *
 from cvxopt import matrix, solvers
 
@@ -118,7 +119,7 @@ def cost_function(x, edge):
     return x-1
 
 def cost_function2(x, edge):
-    return (x-1)**2
+    return (x-1)*(x-1)
 
 '''
 calculate cost using LP Solver
@@ -194,7 +195,7 @@ def process_graph_QPSolver(adj_matrix, sources, sinks, flow_val, cost_function):
     transition_matrix,edge_capacity_factors,edge_flows,vertex_dict = preprocess_graph(adj_matrix,sources,sinks)
     source = 0 #super source
     sink = len(transition_matrix)-1 #super sink
-    CAP_UB = flow_val * len(adj_matrix)
+    CAP_UB = 100#flow_val * len(adj_matrix)
     cap_dict = {}
     for i in range(len(transition_matrix[source])):
         if(transition_matrix[0][i] == 1):
@@ -207,28 +208,27 @@ def process_graph_QPSolver(adj_matrix, sources, sinks, flow_val, cost_function):
         cap_dict[cf] = len(vertex_dict[new_sink_idx]['i'])
 
     # Need to make matrices P,q,G,h
-	# minimizing 1/2 * X_transpose * P * X + q_transpose * X
-	# subject to G*X <= h
+    # minimizing 1/2 * X_transpose * P * X + q_transpose * X
+    # subject to G*X <= h
 
-	'''
-	Matrix P. number of rows/columns is equal to the total number of capacity and flow variables
-	Objective function uses P and q matrices, which will have nonzero values for capacity
-	(since only they appear in the objective function)
-	'''
+    '''
+    Matrix P. number of rows/columns is equal to the total number of capacity and flow variables
+    Objective function uses P and q matrices, which will have nonzero values for capacity
+    (since only they appear in the objective function)
+    '''
 
-	p_diag1 = [2] * len(edge_capacity_factors)
-	p_diag2 = [0] * len(edge_flows)
-	p_diag = p_diag1 + p_diag2
-	P = matrix(numpy.diag(p_diag), tc='d')
+    p_diag1 = [2] * len(edge_capacity_factors)
+    p_diag2 = [0] * len(edge_flows)
+    p_diag = p_diag1 + p_diag2
+    P = matrix(numpy.diag(p_diag), tc='d')
     
     '''q is just a 1-d matrix
-	should have the same coeffs as p_diag (except negative), so just use that'''
+    should have the same coeffs as p_diag (except negative), so just use that'''
     q = matrix(numpy.array(p_diag)*-1, tc='d')
     
     '''
-	Gx <= h (rest of the constraints)
-	'''
-
+    Gx <= h (rest of the constraints)
+    '''
     G_array = []
     h_array = []
 
@@ -246,6 +246,9 @@ def process_graph_QPSolver(adj_matrix, sources, sinks, flow_val, cost_function):
 
         flow_index = edge_flows_start_index + edge_flows.index(flow)
         temp_array[flow_index] = 1
+        #print(temp_array[:len(temp_array)//2])
+        #print(temp_array[len(temp_array)//2:])
+        #input()
         G_array.append(temp_array)
         h_array += [0]
     
@@ -266,6 +269,12 @@ def process_graph_QPSolver(adj_matrix, sources, sinks, flow_val, cost_function):
 
             for j in vertex_dict[i]['o']:
                 temp_array[edge_flows_start_index + edge_flows.index(j)] = 1
+
+            #t1 = temp_array[:len(temp_array)//2]
+            #t2 = temp_array[len(temp_array)//2:]
+            #print (t1)
+            #print (t2)
+            #input()
 
             G_array.append(temp_array)
             h_array += [0]
@@ -311,16 +320,114 @@ def process_graph_QPSolver(adj_matrix, sources, sinks, flow_val, cost_function):
     G_array.append(temp_array)
     h_array += [flow_val]
 
+    # make sure cap,flow vals >= 0
+    # so we add 
+    #   - flow <= 0
+    #   - cap <= 0
+    for i in range(0,(len(edge_capacity_factors) + len(edge_flows))):
+        temp_array = [0] * (len(edge_capacity_factors) + len(edge_flows))
+        temp_array[i] = -1
+        #print(temp_array)
+        #input()
+        G_array.append(temp_array)
+        if(i >= len(edge_capacity_factors)):
+            h_array += [1]
+        else:
+            h_array += [0]
+
     #  solve it!
     G = matrix(numpy.array(G_array),tc='d')    
     h = matrix(numpy.array(h_array),tc='d')
+    #solvers.options['refinement']=2
     sol = solvers.qp(P,q,G,h)
+    #print (sol['status'])
 
     optimal_values = sol['x']
+    #print (optimal_values)
+
     optimal_values = optimal_values[:len(optimal_values)//2]
+    flow_values = optimal_values[len(optimal_values)//2:]
+    k = 0
+    #for i,j in zip(optimal_values,flow_values):
+    #    if(i < j):
+    #        if(not k in sources):
+    #            print ("BAD!!!")
+    #    k += 1
+
+    #print (optimal_values)
     cost = sum([cost_function(val, 0) for val in optimal_values])
     return cost
 
+def test_linear_bnds(pathIn, pathOut):
+    with open(pathIn + 'allComb.csv', 'r') as f:
+        reader = csv.reader(f)
+        allComb = list(reader)
+    for iRow in list(range(0, nrow(allComb))):
+        print("processing: "+str(iRow))
+        print(str(allComb[iRow]))
+        adj_matA = read_txt(filename=pathIn + str(iRow+1) + 'MBefore.csv')
+        adj_matB = read_txt(filename=pathIn + str(iRow+1) + 'MAfter.csv')
+        nSize   = nrow(adj_matA)
+        nSource = int(allComb[iRow][0])
+        nSink   = int(allComb[iRow][0])
+        nTrauma = int(allComb[iRow][1])
+        maxflowBefore = int(allComb[iRow][2])
+        maxflowAfter  = int(allComb[iRow][3])
+        
+        timeStart = time.time()
+        costAfter   = process_graph_QPSolver(adj_matrix=adj_matB, 
+                                              cost_function=cost_function2, 
+                                              flow_val=maxflowBefore, 
+                                              sources= list(range(0, nSource)),
+                                              sinks = list(range(nSize-nSink, nSize)))
+        timeCost  = time.time() - timeStart
+        allComb[iRow].append(costAfter)
+        allComb[iRow].append(timeCost)
+        print(str(allComb[iRow]))
+    write_txt(pathOut + 'allComb_out.csv', allComb)
+
+def main():
+    # adj_matrix = [[0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    # [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0], 
+    # [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0], 
+    # [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0], 
+    # [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0], 
+    # [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], 
+    # [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0], 
+    # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1], 
+    # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+    # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+    # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+    '''test for process_graph_LPSolver'''
+    #     adj_matrix = read_txt('Adj_Matrix0.txt')
+    #     sources = [0,1,2]
+    #     sinks = [9,10,11]
+    #     flow_val = 3
+    #     cost = process_graph_LPSolver(adj_matrix, sources, sinks, flow_val, cost_function)
+    #     print(cost)
+    '''test for linear cost function'''
+#     pathIn  = 'testcases/linear/';
+#     pathOut = 'testcases/linear/'
+#     test_linear(pathIn, pathOut)
+#     pathIn  = 'testcases/sizeofgraphset2/';
+#     pathOut = 'testcases/sizeofgraphset2/'
+#     test_linear(pathIn, pathOut)
+    '''testcase from bn_datasets'''
+    pathIn   = 'bn_dataset/out/bn-cat-mixed-species_brain_1.txt';
+    pathOut  = 'bn_dataset/out/bn-cat-mixed-species_brain_1.txt';
+    test_linear_bnds(pathIn, pathOut)
+    pathIn   = 'bn_dataset/out/bn-fly-drosophila_medulla_1.txt';
+    pathOut  = 'bn_dataset/out/bn-fly-drosophila_medulla_1.txt';
+    test_linear_bnds(pathIn, pathOut)
+    pathIn   = 'bn_dataset/out/bn-macaque-rhesus_brain_1.txt';
+    pathOut  = 'bn_dataset/out/bn-macaque-rhesus_brain_1.txt';
+    test_linear_bnds(pathIn, pathOut)
+    pathIn   = 'bn_dataset/out/bn-mouse_brain_1.txt';
+    pathOut  = 'bn_dataset/out/bn-mouse_brain_1.txt';
+    test_linear_bnds(pathIn, pathOut)
+
+'''
 adj_matrix =[[0,1,1,0],
     [0,0,0,1],
     [0,0,0,1],
@@ -330,4 +437,7 @@ sinks = [3]
 flow_val = 3
 cost = process_graph_QPSolver(adj_matrix, sources, sinks, flow_val, cost_function2)
 
-print cost
+print (cost)
+'''
+
+main()
