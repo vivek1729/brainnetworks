@@ -7,12 +7,19 @@ clear all;
 % p_seq = [0.2, 0.5, 0.8];      % density of graph (to be explained)
 % r_seq = [8, 32, 64];      % nunmber of trauma (to be explained)
 
-%testcase 2
-size_seq = 10 * (10:10:100);  % size of the matrix
+% %testcase 2 size of graph
+% size_seq = 10 * (10:10:100);  % size of the matrix
+% a_seq = [16];    % number of sources
+% b_seq = [16];    % number of sinks
+% p_seq = [0.3];      % density of graph (to be explained)
+% r_seq = [64];      % nunmber of trauma (to be explained)
+
+%testcase 3 percentage of trauma
+size_seq = 200;  % size of the matrix
 a_seq = [16];    % number of sources
 b_seq = [16];    % number of sinks
-p_seq = [0.3];      % density of graph (to be explained)
-r_seq = [64];      % nunmber of trauma (to be explained)
+p_seq = [0.2, 0.8];      % density of graph (to be explained)
+r_seq = [0.01, 0.05, 0.2, 0.5, 0.8]*200;      % nunmber of trauma (to be explained)
 
 %y axises
 %time
@@ -45,15 +52,21 @@ for iRow = 1:nRow
     allComb(iRow, 6:7) = [maxFlowBefore, maxFlowAfter];
 end
 %%
+delete('testcases/sizeofgraphset2/allComb.csv')
 csvwrite("testcases/sizeofgraphset2/allComb.csv", allComb);
-% %% 
-% rng(1000);  % set seeds
-% [A, B, f1, f2] = createadjmat(100, 10, 10, 0.2, 80);
-% size(A)
-% size(B)
-% f1, f2
-
-
+%% 
+rng(1000);  % set seeds
+[A, B, f1, f2] = createadjmat(100, 1, 1, 0.05, 50);
+size(A)
+size(B)
+f1, f2
+%
+G = digraph(B);
+plot(G, 'EdgeLabel',G.Edges.Weight,'Linewidth', 0.5, 'NodeLabel', '', 'Layout', 'circle')
+% Remove axes ticks
+set(gca,'XTick',[],'YTick',[])
+saveas(gcf, 'tmp2.png')
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
